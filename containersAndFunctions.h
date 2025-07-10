@@ -17,6 +17,7 @@ namespace bankSimulation {
 	public:
 		//Account Specific Functions
 		void newAccount();
+		void searchAccounts() const;
 		void saveAccount();
 		void loadAccount();
 
@@ -31,7 +32,7 @@ namespace bankSimulation {
 
 	class Account {
 	private:
-		//Biographical Containers
+		//Biographical Variables
 		std::string holderFistName;
 		std::string holderLastName;
 		unsigned holderAccountNumber;

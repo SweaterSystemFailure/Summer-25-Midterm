@@ -11,6 +11,7 @@ namespace bankSimulation {
    // Storage Class
    // ====================
 
+    //Account Functions
     void Storage::newAccount() {
         Account account;
         std::cout << "Welcome to your new account. Let's start by getting some basic information about you." << std::endl;
@@ -20,16 +21,75 @@ namespace bankSimulation {
             account.setHolderPassword(stringValidator("Please enter the password for your account: "));
         } while (!userCheck("Does this look right to you [Y / N]: ", 
             "Your account is now active!", 
-            "That's okay. Let's try that again."));
+            "That's okay. Let's try again."));
         account.setBalance(0.0);
         accounts.push_back(account);
         mainMenu();
     }
 
+    void Storage::searchAccounts() const{
+        if (accounts.empty()) {
+            std::cout << "No accounts found." << std::endl;
+            return;
+        }
+
+        std::cout << "Search by:" << std::endl;
+        std::cout << "1. Account Number" << std::endl;
+        std::cout << "2. Last Name" << std::endl;
+        char choice = bankSimulation::charValidator("Select 1 or 2: ", { '1', '2' });
+
+        bool found = false;
+
+        switch (choice) {
+        case '1': {
+            unsigned searchNumber = bankSimulation::numericValidator("Enter the account number: ", 1, 999999999);
+
+            for (const auto& acc : accounts) {
+                if (acc.getHolderAccountNumber() == searchNumber) {
+                    std::cout << std::endl << "Account found: " << std::endl;
+                    acc.printAccountBalance();
+                    acc.printAccountHistory();
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                std::cout << "No account found with that number.\n";
+            }
+            break;
+        }
+
+        case '2': {
+            std::string searchLastName = bankSimulation::stringValidator("Enter the account holder's last name: ");
+
+            for (const auto& acc : accounts) {
+                if (acc.getHolderLastName() == searchLastName) {
+                    std::cout << std::endl << "Account found: " << std::endl;
+                    acc.printAccountBalance();
+                    acc.printAccountHistory();
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                std::cout << "No accounts found with that last name." << std::endl;
+            }
+            break;
+        }
+
+        default:
+            std::cout << "Invalid option." << std::endl;
+            break;
+        }
+    }
+    
+
+    //Save/Load Functions
     void Storage::saveAccount() {
         std::ofstream out("accounts.dat", std::ios::binary);
         if (!out) {
-            std::cerr << "Error opening accounts.dat for writing.\n";
+            std::cerr << "Error opening accounts.dat for writing." << std::endl;
             return;
         }
 
@@ -45,7 +105,7 @@ namespace bankSimulation {
     void Storage::loadAccount() {
         std::ifstream in("accounts.dat", std::ios::binary);
         if (!in) {
-            std::cerr << "Could not open accounts.dat for reading.\n";
+            std::cerr << "Could not open accounts.dat for reading." << std::endl;
             return;
         }
 
@@ -65,7 +125,7 @@ namespace bankSimulation {
     void Storage::saveBank() {
         std::ofstream out("funds.dat", std::ios::binary);
         if (!out) {
-            std::cerr << "Error opening funds.dat for writing.\n";
+            std::cerr << "Error opening funds.dat for writing." << std::endl;
             return;
         }
 
@@ -81,7 +141,7 @@ namespace bankSimulation {
     void Storage::loadBank() {
         std::ifstream in("funds.dat", std::ios::binary);
         if (!in) {
-            std::cerr << "Could not open funds.dat for reading.\n";
+            std::cerr << "Could not open funds.dat for reading." << std::endl;
             return;
         }
 
