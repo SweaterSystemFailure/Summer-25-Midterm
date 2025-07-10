@@ -23,6 +23,7 @@ namespace bankSimulation {
 	// ====================
 	// Account Class
 	// ====================
+
 	class Account {
 	private:
 		//Biographical Containers
@@ -51,8 +52,8 @@ namespace bankSimulation {
 		double getBalance() const;
 
 		//Transaction Functions
-		void withdrawal();
-		void deposit();
+		void withdrawal(bankSimulation::BankFunds& bank);
+		void deposit(bankSimulation::BankFunds& bank);
 
 		//Print Functions
 		void printAccountBalance() const;
@@ -62,6 +63,7 @@ namespace bankSimulation {
 	// ====================
 	// BankFunds Class
 	// ====================
+
 	class BankFunds {
 	private:
 		double startingFunds = 15'000'000;
@@ -87,6 +89,7 @@ namespace bankSimulation {
 	// ====================
 	// Validators
 	// ====================
+
 	template <typename T>
 	T numericValidator(const std::string& prompt, T min, T max) {
 		T number;

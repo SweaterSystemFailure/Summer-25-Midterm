@@ -11,7 +11,18 @@ namespace bankSimulation {
    // ====================
 
     void Storage::newAccount() {
-        // TODO: implement new account logic
+        Account account;
+        std::cout << "Welcome to your new account. Let's start by getting some basic information about you." << std::endl;
+        do {
+            account.setHolderFirstName(stringValidator("Please enter your first name: "));
+            account.setHolderLastName(stringValidator("Please enter your last name: "));
+            account.setHolderPassword(stringValidator("Please enter the password for your account: "));
+        } while (!userCheck("Does this look right to you [Y / N]: ", 
+            "Your account is now active!", 
+            "That's okay. Let's try that again."));
+        account.setBalance(0.0);
+        accounts.push_back(account);
+        mainMenu();
     }
 
     void Storage::saveAccount() {
@@ -69,12 +80,35 @@ namespace bankSimulation {
     }
 
     // Transaction Functions
-    void Account::withdrawal() {
-        // TODO: implement withdrawal logic
+    void Account::withdrawal(bankSimulation::BankFunds& bank) {
+        float withdawal = bankSimulation::numericValidator("Please enter the amout of your withdrawal: ", 0.01, 5'000.00);
+        if (withdawal > balance) {
+            std::cout << "Insufficient funds! ";
+            printAccountBalance();
+        }
+        else {
+            balance -= withdawal;
+            accountHistory["Withdrawal"] -= withdawal;
+          
+            double updatedTotal = bank.getTotalWithdrawals() - withdawal;
+            bank.setTotalWithdrawals(updatedTotal);
+           
+            std::cout << "Your withdrawal has been successfully prossessed! ";
+            printAccountBalance();
+        }
     }
 
-    void Account::deposit() {
-        // TODO: implement deposit logic
+    void Account::deposit(bankSimulation::BankFunds& bank) {
+        float deposit = bankSimulation::numericValidator("Please enter the amount of your deposit: ", 0.01, 5'000.00);
+        balance += deposit;
+        accountHistory["Deposit"] += deposit;
+        
+        double updatedTotal = bank.getTotalDeposits() + deposit;
+        bank.setTotalDeposits(updatedTotal);
+
+        
+        std::cout << "Your deposit has been successfully possessed! ";
+        printAccountBalance();
     }
 
     // Print Functions
