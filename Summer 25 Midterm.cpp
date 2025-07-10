@@ -1,8 +1,7 @@
 /*TODO:
-* Windrawal/Deposit Logic
 * Account Tracking Container
-* Save/Load
 * Menus
+* Make sure that withdrawals and deposits save to the storage container in addition to their class container
 */
 
 #include "containersAndFunctions.h"
