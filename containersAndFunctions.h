@@ -15,9 +15,14 @@ namespace bankSimulation {
 		std::vector<Account> accounts;
 		std::vector<BankFunds> funds;
 	public:
+		//Account Specific Functions
 		void newAccount();
 		void saveAccount();
 		void loadAccount();
+
+		//Bank Save/Load Functions
+		void saveBank();
+		void loadBank();
 	};
 	
 	// ====================
@@ -55,6 +60,10 @@ namespace bankSimulation {
 		void withdrawal(bankSimulation::BankFunds& bank);
 		void deposit(bankSimulation::BankFunds& bank);
 
+		//Serialization
+		void serialize(std::ostream& out) const;
+		void deserialize(std::istream& in);
+
 		//Print Functions
 		void printAccountBalance() const;
 		void printAccountHistory() const;
@@ -66,7 +75,7 @@ namespace bankSimulation {
 
 	class BankFunds {
 	private:
-		double startingFunds = 15'000'000;
+		double startingFunds = 15'000'000.00;
 		std::string password = "ShowMeTheMoney";
 		double totalHoldings;
 		double totalDeposits;
@@ -81,6 +90,10 @@ namespace bankSimulation {
 		double getTotalHoldings() const;
 		double getTotalDeposits() const;
 		double getTotalWithdrawals() const;
+
+		//Serialization
+		void serialize(std::ostream& out) const;
+		void deserialize(std::istream& in);
 
 		//Print Function
 		void printBankReport() const;

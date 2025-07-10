@@ -1,4 +1,5 @@
 #include "containersAndFunctions.h"
+#include <fstream>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -6,7 +7,7 @@
 #include <cctype>
 
 namespace bankSimulation {
-    // ====================
+   // ====================
    // Storage Class
    // ====================
 
@@ -26,11 +27,75 @@ namespace bankSimulation {
     }
 
     void Storage::saveAccount() {
-        // TODO: implement save logic
+        std::ofstream out("accounts.dat", std::ios::binary);
+        if (!out) {
+            std::cerr << "Error opening accounts.dat for writing.\n";
+            return;
+        }
+
+        size_t count = accounts.size();
+        out.write(reinterpret_cast<const char*>(&count), sizeof(count));
+        for (const auto& acc : accounts) {
+            acc.serialize(out);
+        }
+
+        out.close();
     }
 
     void Storage::loadAccount() {
-        // TODO: implement load logic
+        std::ifstream in("accounts.dat", std::ios::binary);
+        if (!in) {
+            std::cerr << "Could not open accounts.dat for reading.\n";
+            return;
+        }
+
+        size_t count;
+        in.read(reinterpret_cast<char*>(&count), sizeof(count));
+        accounts.clear();
+
+        for (size_t i = 0; i < count; ++i) {
+            Account temp;
+            temp.deserialize(in);
+            accounts.push_back(temp);
+        }
+
+        in.close();
+    }
+
+    void Storage::saveBank() {
+        std::ofstream out("funds.dat", std::ios::binary);
+        if (!out) {
+            std::cerr << "Error opening funds.dat for writing.\n";
+            return;
+        }
+
+        size_t count = funds.size();
+        out.write(reinterpret_cast<const char*>(&count), sizeof(count));
+        for (const auto& fund : funds) {
+            fund.serialize(out);
+        }
+
+        out.close();
+    }
+
+    void Storage::loadBank() {
+        std::ifstream in("funds.dat", std::ios::binary);
+        if (!in) {
+            std::cerr << "Could not open funds.dat for reading.\n";
+            return;
+        }
+
+        size_t count;
+        in.read(reinterpret_cast<char*>(&count), sizeof(count));
+        funds.clear();
+
+        for (size_t i = 0; i < count; ++i) {
+            BankFunds temp;
+            temp.deserialize(in);
+            funds.push_back(temp);
+        }
+
+        in.close();
     }
 
     // ====================
@@ -111,6 +176,79 @@ namespace bankSimulation {
         printAccountBalance();
     }
 
+    //Serialization Functions
+    void Account::serialize(std::ostream& out) const {
+        size_t len;
+
+        // First Name
+        len = holderFistName.size();
+        out.write(reinterpret_cast<const char*>(&len), sizeof(len));
+        out.write(holderFistName.c_str(), len);
+
+        // Last Name
+        len = holderLastName.size();
+        out.write(reinterpret_cast<const char*>(&len), sizeof(len));
+        out.write(holderLastName.c_str(), len);
+
+        // Account number, password, balance
+        out.write(reinterpret_cast<const char*>(&holderAccountNumber), sizeof(holderAccountNumber));
+
+        len = holderPassword.size();
+        out.write(reinterpret_cast<const char*>(&len), sizeof(len));
+        out.write(holderPassword.c_str(), len);
+
+        out.write(reinterpret_cast<const char*>(&balance), sizeof(balance));
+
+        // History size
+        size_t mapSize = accountHistory.size();
+        out.write(reinterpret_cast<const char*>(&mapSize), sizeof(mapSize));
+
+        for (const auto& [key, value] : accountHistory) {
+            len = key.size();
+            out.write(reinterpret_cast<const char*>(&len), sizeof(len));
+            out.write(key.c_str(), len);
+            out.write(reinterpret_cast<const char*>(&value), sizeof(value));
+        }
+    }
+
+    void Account::deserialize(std::istream& in) {
+        size_t len;
+
+        // First Name
+        in.read(reinterpret_cast<char*>(&len), sizeof(len));
+        holderFistName.resize(len);
+        in.read(&holderFistName[0], len);
+
+        // Last Name
+        in.read(reinterpret_cast<char*>(&len), sizeof(len));
+        holderLastName.resize(len);
+        in.read(&holderLastName[0], len);
+
+        in.read(reinterpret_cast<char*>(&holderAccountNumber), sizeof(holderAccountNumber));
+
+        // Password
+        in.read(reinterpret_cast<char*>(&len), sizeof(len));
+        holderPassword.resize(len);
+        in.read(&holderPassword[0], len);
+
+        in.read(reinterpret_cast<char*>(&balance), sizeof(balance));
+
+        // History
+        size_t mapSize;
+        in.read(reinterpret_cast<char*>(&mapSize), sizeof(mapSize));
+        accountHistory.clear();
+        for (size_t i = 0; i < mapSize; ++i) {
+            std::string key;
+            float value;
+
+            in.read(reinterpret_cast<char*>(&len), sizeof(len));
+            key.resize(len);
+            in.read(&key[0], len);
+            in.read(reinterpret_cast<char*>(&value), sizeof(value));
+            accountHistory[key] = value;
+        }
+    }
+
     // Print Functions
     void Account::printAccountBalance() const {
         std::cout << "Current Balance: $" << balance << std::endl;
@@ -151,6 +289,38 @@ namespace bankSimulation {
 
     double BankFunds::getTotalWithdrawals() const {
         return totalWithdrawals;
+    }
+
+    //Serialization
+    void BankFunds::serialize(std::ostream& out) const {
+        // Write startingFunds
+        out.write(reinterpret_cast<const char*>(&startingFunds), sizeof(startingFunds));
+
+        // Write password
+        size_t passwordLength = password.size();
+        out.write(reinterpret_cast<const char*>(&passwordLength), sizeof(passwordLength));
+        out.write(password.c_str(), passwordLength);
+
+        // Write totals
+        out.write(reinterpret_cast<const char*>(&totalHoldings), sizeof(totalHoldings));
+        out.write(reinterpret_cast<const char*>(&totalDeposits), sizeof(totalDeposits));
+        out.write(reinterpret_cast<const char*>(&totalWithdrawals), sizeof(totalWithdrawals));
+    }
+
+    void BankFunds::deserialize(std::istream& in) {
+        // Read startingFunds
+        in.read(reinterpret_cast<char*>(&startingFunds), sizeof(startingFunds));
+
+        // Read password
+        size_t passwordLength;
+        in.read(reinterpret_cast<char*>(&passwordLength), sizeof(passwordLength));
+        password.resize(passwordLength);
+        in.read(&password[0], passwordLength);
+
+        // Read totals
+        in.read(reinterpret_cast<char*>(&totalHoldings), sizeof(totalHoldings));
+        in.read(reinterpret_cast<char*>(&totalDeposits), sizeof(totalDeposits));
+        in.read(reinterpret_cast<char*>(&totalWithdrawals), sizeof(totalWithdrawals));
     }
 
     // Print Function
