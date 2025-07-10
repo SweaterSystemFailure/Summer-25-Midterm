@@ -127,7 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="containersAndFunctions.cpp" />
+    <ClCompile Include="menus.cpp" />
     <ClCompile Include="Summer 25 Midterm.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="containersAndFunctions.h" />
+    <ClInclude Include="menus.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
