@@ -79,7 +79,6 @@ namespace bankSimulation {
 				break;
 			case 2: {
 				if (logIn(storage, false)) {
-					// Get a pointer to the matching account
 					std::string lastName = stringValidator("Re-enter your last name to access your account: ");
 					for (auto& acc : storage.getAccounts()) {
 						if (acc.getHolderLastName() == lastName) {

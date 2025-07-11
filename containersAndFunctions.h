@@ -17,7 +17,7 @@ namespace bankSimulation {
 		unsigned lastAccountNumber = 10'000;
 	public:
 		//Accessors
-		const std::vector<Account>& getAccounts() const;
+		std::vector<Account>& getAccounts();
 		std::vector<BankFunds>& getFunds();
 
 		//Account Specific Functions
@@ -74,8 +74,8 @@ namespace bankSimulation {
 		double getBalance() const;
 
 		//Transaction Functions
-		void withdrawal(bankSimulation::BankFunds& bank);
-		void deposit(bankSimulation::BankFunds& bank);
+		void withdrawal(BankFunds& bank);
+		void deposit(BankFunds& bank);
 		void logTransaction(const std::string& type, double amount, double resultingBalance);
 
 

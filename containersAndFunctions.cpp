@@ -6,6 +6,7 @@
 #include <iostream>
 #include <limits>
 #include <cctype>
+#include <iomanip>
 #include <ctime>
 #include <sstream>
 
@@ -14,7 +15,7 @@ namespace bankSimulation {
     // Storage Class
     // ====================
     //Accessors
-    const std::vector<Account>& Storage::getAccounts() const {
+    std::vector<Account>& Storage::getAccounts()  {
         return accounts;
     }
 
@@ -547,7 +548,7 @@ namespace bankSimulation {
         if (employeeCheck) {
             while (securityCounter < 3) {
                 std::string entered = stringValidator("Please enter the employee password: ");
-                if (!storage.funds.empty() && entered == storage.funds[0].getPassword()) {
+                if (!storage.getFunds().empty() && entered == storage.getFunds()[0].getPassword()){
                     std::cout << "Employee login successful.\n";
                     return true;
                 }
@@ -561,12 +562,12 @@ namespace bankSimulation {
         }
 
         // User Login Path
-        Account* matchedAccount = nullptr;
+        const Account* matchedAccount = nullptr;
 
         while (securityCounter < 3 && !matchedAccount) {
             std::string lastName = stringValidator("Please enter your last name: ");
 
-            for (auto& acc : storage.getAccounts()) {
+            for (const auto& acc : storage.getAccounts()) {
                 if (acc.getHolderLastName() == lastName) {
                     matchedAccount = &acc;
                     break;
@@ -574,7 +575,7 @@ namespace bankSimulation {
             }
 
             if (!matchedAccount) {
-                std::cout << "Account not found." << std::endl;
+                std::cout << "Account not found.\n";
                 securityCounter++;
             }
         }
