@@ -44,9 +44,19 @@ namespace bankSimulation {
 		std::string holderPassword;
 		double balance;
 
+		//Transaction Element Storage
+		struct Transaction {
+			std::string type;       // "Deposit" or "Withdrawal"
+			double amount;
+			double resultingBalance;
+			std::string timestamp;
+		};
 
 		//Transaction Histoy
-		std::map <std::string, float> accountHistory;
+		static const int MAX_TRANSACTIONS = 1'000;
+
+		Transaction transactionHistory[MAX_TRANSACTIONS];
+		int transactionCount = 0;;
 
 	public:
 		//Mutators
@@ -66,6 +76,8 @@ namespace bankSimulation {
 		//Transaction Functions
 		void withdrawal(bankSimulation::BankFunds& bank);
 		void deposit(bankSimulation::BankFunds& bank);
+		void logTransaction(const std::string& type, double amount, double resultingBalance);
+
 
 		//Serialization
 		void serialize(std::ostream& out) const;

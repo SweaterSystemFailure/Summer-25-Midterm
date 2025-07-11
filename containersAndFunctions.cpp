@@ -6,6 +6,8 @@
 #include <iostream>
 #include <limits>
 #include <cctype>
+#include <ctime>
+#include <sstream>
 
 namespace bankSimulation {
     // ====================
@@ -244,17 +246,40 @@ namespace bankSimulation {
         }
     }
 
-    void Account::deposit(bankSimulation::BankFunds& bank) {
-        float deposit = bankSimulation::numericValidator("Enter deposit amount: ", 0.01f, 5000.0f);
+    void Account::deposit(BankFunds& bank) {
+        double depositAmount = numericValidator("Enter deposit amount: ", 0.01, 5000.0);
+        balance += depositAmount;
 
-        balance += deposit;
-        accountHistory["Deposit"] += deposit;
+        logTransaction("Deposit", depositAmount, balance);
 
-        double newTotal = bank.getTotalDeposits() + deposit;
-        bank.setTotalDeposits(newTotal);
+        bank.setTotalDeposits(bank.getTotalDeposits() + depositAmount);
 
-        std::cout << "Your deposit has been successfully processed! ";
+        std::cout << "Deposit successful. ";
         printAccountBalance();
+    }
+
+    void Account::logTransaction(const std::string& type, double amount, double resultingBalance) {
+        if (transactionCount >= MAX_TRANSACTIONS) {
+            std::cout << "Transaction log full. Oldest entry will be overwritten." << std::endl;
+            // Optionally shift everything left
+            for (int i = 1; i < MAX_TRANSACTIONS; ++i) {
+                transactionHistory[i - 1] = transactionHistory[i];
+            }
+            transactionCount = MAX_TRANSACTIONS - 1;
+        }
+
+        Transaction t;
+        t.type = type;
+        t.amount = amount;
+        t.resultingBalance = resultingBalance;
+
+        // Get timestamp
+        auto now = std::time(nullptr);
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&now), "%Y-%m-%d %H:%M:%S");
+        t.timestamp = ss.str();
+
+        transactionHistory[transactionCount++] = t;
     }
 
     //Serialization Functions
@@ -336,7 +361,14 @@ namespace bankSimulation {
     }
 
     void Account::printAccountHistory() const {
-        //TODO: Figure out how to save/track account interactions better. Map seems like the wrong container. Maybe this is where the mandatory array goes?
+        std::cout << "Transaction History:" << std::endl;
+        for (int i = 0; i < transactionCount; ++i) {
+            const auto& t = transactionHistory[i];
+            std::cout << t.timestamp << " | "
+                << t.type << " | "
+                << "$" << t.amount << " | "
+                << "Balance after: $" << t.resultingBalance << std::endl;
+        }
     }
 
     // ====================

@@ -1,6 +1,5 @@
 /*TODO:
 * Account Tracking Container
-* Add logic to require strong passwords
 */
 
 #include "containersAndFunctions.h"
