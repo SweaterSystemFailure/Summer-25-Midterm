@@ -68,34 +68,15 @@ namespace bankSimulation {
         }
     }
 
-    //Password Validation
-    bool logIn(Storage& storage, bool employeeCheck) {
+    //User Password Validation
+    Account* userLogIn(Storage& storage) {
         short securityCounter = 0;
-
-        //Employee Login Path
-        if (employeeCheck) {
-            while (securityCounter < 3) {
-                std::string entered = stringValidator("Please enter the employee password: ");
-                if (!storage.getFunds().empty() && entered == storage.getFunds()[0].getPassword()) {
-                    std::cout << "Employee login successful.\n";
-                    return true;
-                }
-                else {
-                    std::cout << "Invalid password.\n";
-                    securityCounter++;
-                }
-            }
-            std::cout << "Too many failed login attempts. Exiting program.\n";
-            return false;
-        }
-
-        // User Login Path
-        const Account* matchedAccount = nullptr;
+        Account* matchedAccount = nullptr;
 
         while (securityCounter < 3 && !matchedAccount) {
             std::string lastName = stringValidator("Please enter your last name: ");
 
-            for (const auto& acc : storage.getAccounts()) {
+            for (auto& acc : storage.getAccounts()) {
                 if (acc.getHolderLastName() == lastName) {
                     matchedAccount = &acc;
                     break;
@@ -110,7 +91,7 @@ namespace bankSimulation {
 
         if (!matchedAccount) {
             std::cout << "Too many failed login attempts. Exiting program." << std::endl;
-            return false;
+            return nullptr;
         }
 
         securityCounter = 0;
@@ -118,7 +99,7 @@ namespace bankSimulation {
             std::string enteredPassword = stringValidator("Please enter your password: ");
             if (enteredPassword == matchedAccount->getHolderPassword()) {
                 std::cout << "Login successful." << std::endl;
-                return true;
+                return matchedAccount;
             }
             else {
                 std::cout << "Incorrect password." << std::endl;
@@ -127,8 +108,29 @@ namespace bankSimulation {
         }
 
         std::cout << "Too many failed login attempts. Exiting program.\n";
+        return nullptr;
+    }
+
+    bool employeeLogIn(Storage& storage) {
+        short securityCounter = 0;
+
+        while (securityCounter < 3) {
+            std::string entered = stringValidator("Please enter the employee password: ");
+            if (!storage.getFunds().empty() && entered == storage.getFunds()[0].getPassword()) {
+                std::cout << "Employee login successful.\n";
+                return true;
+            }
+            else {
+                std::cout << "Invalid password.\n";
+                securityCounter++;
+            }
+        }
+        std::cout << "Too many failed login attempts. Exiting program.\n";
         return false;
     }
+
+
+
 
     //Strong Password Validation
     bool passwordCheck(const std::string& password) {

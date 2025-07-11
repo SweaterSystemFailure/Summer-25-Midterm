@@ -2,9 +2,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "BankFunds.h"
 
 namespace bankSimulation {
+	class Storage;
+	class BankFunds;
+	
 	class Account {
 	private:
 		//Biographical Variables
@@ -44,10 +46,9 @@ namespace bankSimulation {
 		double getBalance() const;
 
 		//Transaction Functions
-		void withdrawal(BankFunds& bank);
-		void deposit(BankFunds& bank);
-		void logTransaction(const std::string& type, double amount, double resultingBalance);
-
+		void deposit(BankFunds& bank, Storage& storage);
+		void withdrawal(BankFunds& bank, Storage& storage);
+		void logTransaction(const std::string& type, double amount, double resultingBalance, Storage& storage);
 
 		//Serialization
 		void serialize(std::ostream& out) const;

@@ -33,7 +33,8 @@ namespace bankSimulation {
 	std::string stringValidator(const std::string& prompt);
 	char charValidator(const std::string& prompt, const std::vector<char>& validOptions);
 	bool userCheck(const std::string& prompt, const std::string& yesPrompt, const std::string& noPrompt);
-	bool logIn(bankSimulation::Storage& storage, bool employeeCheck);
+	Account* userLogIn(Storage& storage);
+	bool employeeLogIn(Storage& storage);
 	bool passwordCheck(const std::string& password);
 }
 

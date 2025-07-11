@@ -1,6 +1,7 @@
 #include "Account.h"
 #include "BankFunds.h"
 #include "Validators.h"
+#include "Storage.h"
 #include <iomanip>
 #include <ctime>
 #include <sstream>
@@ -49,9 +50,8 @@ namespace bankSimulation {
     }
 
     // Transaction Functions
-    void Account::withdrawal(BankFunds& bank) {
-        double amount =numericValidator(
-            "Enter withdrawal amount: ", 0.01, 5000.00);
+    void Account::withdrawal(BankFunds& bank, Storage& storage) {
+        double amount = numericValidator("Enter withdrawal amount: ", 0.01, 5000.00);
 
         if (amount > balance) {
             std::cout << "Insufficient funds. ";
@@ -60,32 +60,44 @@ namespace bankSimulation {
         }
 
         balance -= amount;
-        logTransaction("Withdrawal", amount, balance);
+        logTransaction("Withdrawal", amount, balance, storage);
 
-        double updatedTotal = bank.getTotalWithdrawals() + amount;
-        bank.setTotalWithdrawals(updatedTotal);
+        // Update withdrawal total
+        double updatedWithdrawals = bank.getTotalWithdrawals() + amount;
+        bank.setTotalWithdrawals(updatedWithdrawals);
+
+        // Update total holdings
+        double updatedHoldings = bank.getTotalHoldings() - amount;
+        bank.setTotalHoldings(updatedHoldings);
 
         std::cout << "Withdrawal successful. ";
         printAccountBalance();
     }
 
-    void Account::deposit(BankFunds& bank) {
+
+    void Account::deposit(BankFunds& bank, Storage& storage) {
         double amount = numericValidator("Enter deposit amount: ", 0.01, 5000.00);
 
         balance += amount;
-        logTransaction("Deposit", amount, balance);
+        logTransaction("Deposit", amount, balance, storage);
 
-        double updatedTotal = bank.getTotalDeposits() + amount;
-        bank.setTotalDeposits(updatedTotal);
+        // Update deposit total
+        double updatedDeposits = bank.getTotalDeposits() + amount;
+        bank.setTotalDeposits(updatedDeposits);
+
+        // Update total holdings
+        double updatedHoldings = bank.getTotalHoldings() + amount;
+        bank.setTotalHoldings(updatedHoldings);
 
         std::cout << "Deposit successful. ";
         printAccountBalance();
     }
 
-    void Account::logTransaction(const std::string& type, double amount, double resultingBalance) {
+
+
+    void Account::logTransaction(const std::string& type, double amount, double resultingBalance, Storage& storage) {
         if (transactionCount >= maxTransactions) {
             std::cout << "Transaction log full. Oldest entry will be overwritten." << std::endl;
-            // Optionally shift everything left
             for (int i = 1; i < maxTransactions; ++i) {
                 transactionHistory[i - 1] = transactionHistory[i];
             }
@@ -97,16 +109,21 @@ namespace bankSimulation {
         t.amount = amount;
         t.resultingBalance = resultingBalance;
 
-        // Get timestamp
         auto now = std::time(nullptr);
         std::tm timeInfo;
         localtime_s(&timeInfo, &now);
 
         std::stringstream ss;
         ss << std::put_time(&timeInfo, "%Y-%m-%d %H:%M:%S");
-        std::string timestamp = ss.str();
+        t.timestamp = ss.str();
+
         transactionHistory[transactionCount++] = t;
+
+        // Save updated data
+        storage.saveAccount();
+        storage.saveBank();
     }
+
 
     //Serialization Functions
     void Account::serialize(std::ostream& out) const {
@@ -203,10 +220,12 @@ namespace bankSimulation {
 
     // Print Functions
     void Account::printAccountBalance() const {
+        std::cout << std::fixed << std::setprecision(2);
         std::cout << "Current Balance: $" << balance << std::endl;
     }
 
     void Account::printAccountHistory() const {
+        std::cout << std::fixed << std::setprecision(2); 
         std::cout << "Transaction History:" << std::endl;
         for (int i = 0; i < transactionCount; ++i) {
             const auto& t = transactionHistory[i];
@@ -216,4 +235,5 @@ namespace bankSimulation {
                 << "Balance after: $" << t.resultingBalance << std::endl;
         }
     }
+
 }

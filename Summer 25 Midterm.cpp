@@ -9,16 +9,12 @@ using namespace bankSimulation;
 
 int main()
 {
+    //storage instantiation
     Storage storage;
+    //load from relevent .dat files.
     storage.loadBank();
     storage.loadAccount();
-    if (storage.getFunds().empty()) {
-        std::cerr << "WARNING: Bank funds failed to load.\n";
-    }
-    else {
-        std::cout << "Bank password loaded: " << storage.getFunds()[0].getPassword() << std::endl;
-    }
-
+    //login menus for clients/employee branching
     branchMenu(storage);
     
     return 0;

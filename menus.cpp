@@ -1,4 +1,5 @@
 #include "menus.h"
+#include "Account.h"
 #include "Storage.h"
 #include "Validators.h"
 #include <iostream>
@@ -17,10 +18,10 @@ namespace bankSimulation {
 
 			switch (numericValidator("Your selection: ", 1, 5)) {
 			case 1:
-				account.deposit(bank);
+				account.deposit(bank, storage);
 				break;
 			case 2:
-				account.withdrawal(bank);
+				account.withdrawal(bank, storage);
 				break;
 			case 3:
 				account.printAccountBalance();
@@ -89,25 +90,26 @@ namespace bankSimulation {
 					break;
 				}
 
-				if (logIn(storage, false)) {
-					std::string lastName = stringValidator("Re-enter your last name to access your account: ");
-					for (auto& acc : storage.getAccounts()) {
-						if (acc.getHolderLastName() == lastName) {
-							if (!storage.getFunds().empty()) {
-								userMenu(storage, acc, storage.getFunds()[0]);
-							}
-							else {
-								std::cout << "Bank funds are not initialized. Please contact an employee.\n";
-							}
-							break;
-						}
+				if (Account* acc = userLogIn(storage)) {
+					if (!storage.getFunds().empty()) {
+						userMenu(storage, *acc, storage.getFunds()[0]);
 					}
+					else {
+						std::cout << "Bank funds are not initialized. Please contact an employee.\n";
+					}
+				}
+				else {
+					std::cout << "User login failed or cancelled.\n";
 				}
 				break;
 			}
+
 			case 3:
-				if (logIn(storage, true)) {
+				if (employeeLogIn(storage)) {
 					employeeMenu(storage);
+				}
+				else {
+					std::cout << "Employee login failed.\n";
 				}
 				break;
 			case 4:
