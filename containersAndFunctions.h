@@ -15,6 +15,10 @@ namespace bankSimulation {
 		std::vector<Account> accounts;
 		std::vector<BankFunds> funds;
 	public:
+		//Accessors
+		const std::vector<Account>& getAccounts() const { return accounts; };
+		std::vector<BankFunds>& getFunds() { return funds; };
+
 		//Account Specific Functions
 		void newAccount();
 		void searchAccounts() const;
@@ -39,6 +43,7 @@ namespace bankSimulation {
 		std::string holderPassword;
 		double balance;
 
+
 		//Transaction Histoy
 		std::map <std::string, float> accountHistory;
 
@@ -47,7 +52,7 @@ namespace bankSimulation {
 		void setHolderFirstName(const std::string& entry);
 		void setHolderLastName(const std::string& entry);
 		void setHolderAccountNumber(const unsigned& entry);
-		void setHolderPassword(const unsigned& entry);
+		void setHolderPassword(const std::string& entry);
 		void setBalance(const double& entry);
 
 		//Accessors
@@ -88,6 +93,7 @@ namespace bankSimulation {
 		double setTotalWithdrawals(const double& entry);
 
 		//Accessors
+		std::string getPassword() const;
 		double getTotalHoldings() const;
 		double getTotalDeposits() const;
 		double getTotalWithdrawals() const;
@@ -131,4 +137,5 @@ namespace bankSimulation {
 	std::string stringValidator(const std::string& prompt);
 	char charValidator(const std::string& prompt, const std::vector<char>& validOptions);
 	bool userCheck(const std::string& prompt, const std::string& yesPrompt, const std::string& noPrompt);
+	bool logIn(Storage& storage, bool employeeCheck);
 }

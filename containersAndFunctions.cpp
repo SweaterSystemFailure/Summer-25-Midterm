@@ -1,4 +1,5 @@
 #include "containersAndFunctions.h"
+#include "menus.h"
 #include <fstream>
 #include <vector>
 #include <string>
@@ -7,9 +8,17 @@
 #include <cctype>
 
 namespace bankSimulation {
-   // ====================
-   // Storage Class
-   // ====================
+    // ====================
+    // Storage Class
+    // ====================
+    //Accessors
+    const std::vector<Account>& Storage::getAccounts() const {
+        return accounts;
+    }
+
+    std::vector<BankFunds>& Storage::getFunds() {
+        return funds;
+    }
 
     //Account Functions
     void Storage::newAccount() {
@@ -19,15 +28,14 @@ namespace bankSimulation {
             account.setHolderFirstName(stringValidator("Please enter your first name: "));
             account.setHolderLastName(stringValidator("Please enter your last name: "));
             account.setHolderPassword(stringValidator("Please enter the password for your account: "));
-        } while (!userCheck("Does this look right to you [Y / N]: ", 
-            "Your account is now active!", 
+        } while (!userCheck("Does this look right to you [Y / N]: ",
+            "Your account is now active!",
             "That's okay. Let's try again."));
         account.setBalance(0.0);
         accounts.push_back(account);
-        mainMenu();
     }
 
-    void Storage::searchAccounts() const{
+    void Storage::searchAccounts() const {
         if (accounts.empty()) {
             std::cout << "No accounts found." << std::endl;
             return;
@@ -83,7 +91,7 @@ namespace bankSimulation {
             break;
         }
     }
-    
+
 
     //Save/Load Functions
     void Storage::saveAccount() {
@@ -175,8 +183,8 @@ namespace bankSimulation {
         holderAccountNumber = entry;
     }
 
-    void Account::setHolderPassword(const unsigned& entry) {
-        holderPassword = std::to_string(entry);
+    void Account::setHolderPassword(const std::string& entry) {
+        holderPassword = entry;
     }
 
     void Account::setBalance(const double& entry) {
@@ -214,10 +222,10 @@ namespace bankSimulation {
         else {
             balance -= withdawal;
             accountHistory["Withdrawal"] -= withdawal;
-          
+
             double updatedTotal = bank.getTotalWithdrawals() - withdawal;
             bank.setTotalWithdrawals(updatedTotal);
-           
+
             std::cout << "Your withdrawal has been successfully prossessed! ";
             printAccountBalance();
         }
@@ -227,11 +235,11 @@ namespace bankSimulation {
         float deposit = bankSimulation::numericValidator("Please enter the amount of your deposit: ", 0.01, 5'000.00);
         balance += deposit;
         accountHistory["Deposit"] += deposit;
-        
+
         double updatedTotal = bank.getTotalDeposits() + deposit;
         bank.setTotalDeposits(updatedTotal);
 
-        
+
         std::cout << "Your deposit has been successfully possessed! ";
         printAccountBalance();
     }
@@ -315,7 +323,7 @@ namespace bankSimulation {
     }
 
     void Account::printAccountHistory() const {
-     //TODO: Figure out how to save/track account interactions better. Map seems like the wrong container. Maybe this is where the mandatory array goes?
+        //TODO: Figure out how to save/track account interactions better. Map seems like the wrong container. Maybe this is where the mandatory array goes?
     }
 
     // ====================
@@ -395,65 +403,126 @@ namespace bankSimulation {
     // ====================
     // Validators
     // ====================
-    
-	//User Input: String Validation
-	std::string stringValidator(const std::string& prompt) {
-		std::string userInput;
-		while (true) {
-			std::cout << prompt;
-			std::getline(std::cin, userInput);
-			if (userInput.empty()) {
-				std::cout << "Invalid input. This field can't be empty. Try again: " << std::endl;
-			}
-			else {
-				return userInput;
-			}
-		}
-	}
 
-	//User Input: Char Validation
-	char charValidator(const std::string& prompt, const std::vector<char>& validOptions) {
-		char input;
-		while (true) {
-			std::cout << prompt << std::endl;
-			std::cin >> input;
-			input = static_cast<char>(std::tolower(static_cast<unsigned char>(input)));
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //User Input: String Validation
+    std::string stringValidator(const std::string& prompt) {
+        std::string userInput;
+        while (true) {
+            std::cout << prompt;
+            std::getline(std::cin, userInput);
+            if (userInput.empty()) {
+                std::cout << "Invalid input. This field can't be empty. Try again: " << std::endl;
+            }
+            else {
+                return userInput;
+            }
+        }
+    }
 
-			for (char option : validOptions) {
-				if (static_cast<char>(std::tolower(static_cast<unsigned char>(option))) == input) {
-					return input;
-				}
-			}
+    //User Input: Char Validation
+    char charValidator(const std::string& prompt, const std::vector<char>& validOptions) {
+        char input;
+        while (true) {
+            std::cout << prompt << std::endl;
+            std::cin >> input;
+            input = static_cast<char>(std::tolower(static_cast<unsigned char>(input)));
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-			std::cout << "Invalid input. Please enter one of the following: ";
-			for (char option : validOptions) {
-				std::cout << option << " ";
-			}
-			std::cout << std::endl;
-		}
-	}
+            for (char option : validOptions) {
+                if (static_cast<char>(std::tolower(static_cast<unsigned char>(option))) == input) {
+                    return input;
+                }
+            }
 
-	//User Input Check
-	bool userCheck(const std::string& prompt, const std::string& yesPrompt, const std::string& noPrompt) {
-		char choice;
-		while (true) {
-			std::cout << prompt << std::endl;
-			std::cin >> choice;
-			choice = static_cast<char>(std::tolower(static_cast<unsigned char>(choice)));
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Please enter one of the following: ";
+            for (char option : validOptions) {
+                std::cout << option << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
 
-			if (choice == 'y') {
-				std::cout << yesPrompt << std::endl << std::endl;
-				return true;
-			}
-			else if (choice == 'n') {
-				std::cout << noPrompt << std::endl << std::endl;
-				return false;
-			}
-			else {
-				std::cout << "Invalid input. Please enter y or n." << std::endl << std::endl;
-			}
-		}
-	}
-}
+    //User Input Check
+    bool userCheck(const std::string& prompt, const std::string& yesPrompt, const std::string& noPrompt) {
+        char choice;
+        while (true) {
+            std::cout << prompt << std::endl;
+            std::cin >> choice;
+            choice = static_cast<char>(std::tolower(static_cast<unsigned char>(choice)));
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+            if (choice == 'y') {
+                std::cout << yesPrompt << std::endl << std::endl;
+                return true;
+            }
+            else if (choice == 'n') {
+                std::cout << noPrompt << std::endl << std::endl;
+                return false;
+            }
+            else {
+                std::cout << "Invalid input. Please enter y or n." << std::endl << std::endl;
+            }
+        }
+    }
+
+    //Password Validation
+    bool logIn(Storage& storage, bool employeeCheck) {
+        short securityCounter = 0;
+
+        //Employee Login Path
+        if (employeeCheck) {
+            while (securityCounter < 3) {
+                std::string entered = stringValidator("Please enter the employee password: ");
+                if (!storage.funds.empty() && entered == storage.funds[0].getPassword()) {
+                    std::cout << "Employee login successful.\n";
+                    return true;
+                }
+                else {
+                    std::cout << "Invalid password.\n";
+                    securityCounter++;
+                }
+            }
+            std::cout << "Too many failed login attempts. Exiting program.\n";
+            return false;
+        }
+
+        // User Login Path
+        Account* matchedAccount = nullptr;
+
+        while (securityCounter < 3 && !matchedAccount) {
+            std::string lastName = stringValidator("Please enter your last name: ");
+
+            for (auto& acc : storage.getAccounts()) {
+                if (acc.getHolderLastName() == lastName) {
+                    matchedAccount = &acc;
+                    break;
+                }
+            }
+
+            if (!matchedAccount) {
+                std::cout << "Account not found." << std::endl;
+                securityCounter++;
+            }
+        }
+
+        if (!matchedAccount) {
+            std::cout << "Too many failed login attempts. Exiting program.\n";
+            return false;
+        }
+
+        securityCounter = 0;
+        while (securityCounter < 3) {
+            std::string enteredPassword = stringValidator("Please enter your password: ");
+            if (enteredPassword == matchedAccount->getHolderPassword()) {
+                std::cout << "Login successful." << std::endl;
+                return true;
+            }
+            else {
+                std::cout << "Incorrect password." << std::endl;
+                securityCounter++;
+            }
+        }
+
+        std::cout << "Too many failed login attempts. Exiting program.\n";
+        return false;
+    }
