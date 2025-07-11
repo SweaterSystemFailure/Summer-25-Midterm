@@ -6,6 +6,17 @@
 
 namespace bankSimulation {
 
+	/**
+	 * @brief Displays the interactive user menu for account operations.
+	 *
+	 * Allows authenticated users to perform standard banking actions such as depositing,
+	 * withdrawing, checking balances, and viewing transaction history. Changes are saved
+	 * on exit.
+	 *
+	 * @param storage Reference to the Storage object managing persistent data.
+	 * @param account Reference to the logged-in Account object.
+	 * @param bank Reference to the centralized BankFunds object.
+	 */
 	void userMenu(Storage& storage, Account& account, BankFunds& bank) {
 		bool exit = false;
 		while (!exit) {
@@ -33,7 +44,6 @@ namespace bankSimulation {
 				storage.saveAccount();
 				storage.saveBank();
 				exit = true;
-				
 				break;
 			default:
 				std::cout << "Invalid selection." << std::endl;
@@ -41,10 +51,18 @@ namespace bankSimulation {
 		}
 	}
 
+	/**
+	 * @brief Displays the employee menu for administrative banking tasks.
+	 *
+	 * Enables access to bank-level data operations, including generating bank reports
+	 * and searching user accounts. Saves data upon exiting the menu.
+	 *
+	 * @param storage Reference to the Storage object managing all accounts and funds.
+	 */
 	void employeeMenu(Storage& storage) {
 		bool exit = false;
 		while (!exit) {
-			std::cout << std::endl <<  "Employee Menu" << std::endl;
+			std::cout << std::endl << "Employee Menu" << std::endl;
 			std::cout << "1. Print bank report" << std::endl;
 			std::cout << "2. Search accounts" << std::endl;
 			std::cout << "3. Exit" << std::endl;
@@ -70,6 +88,14 @@ namespace bankSimulation {
 		}
 	}
 
+	/**
+	 * @brief Launches the top-level branch menu for customer and employee access.
+	 *
+	 * Serves as the main entry point of the application. Offers account creation,
+	 * user login, employee login, and exit. On exit, all data is saved.
+	 *
+	 * @param storage Reference to the Storage object for managing persistent system data.
+	 */
 	void branchMenu(Storage& storage) {
 		bool exit = false;
 
@@ -103,7 +129,6 @@ namespace bankSimulation {
 				}
 				break;
 			}
-
 			case 3:
 				if (employeeLogIn(storage)) {
 					employeeMenu(storage);

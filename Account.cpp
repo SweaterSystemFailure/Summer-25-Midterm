@@ -7,49 +7,103 @@
 #include <sstream>
 
 namespace bankSimulation {
-    // Mutators
+
+    // === Mutators ===
+
+    /**
+     * @brief Sets the account holder's first name.
+     * @param entry New first name to assign.
+     */
     void Account::setHolderFirstName(const std::string& entry) {
         holderFistName = entry;
     }
 
+    /**
+     * @brief Sets the account holder's last name.
+     * @param entry New last name to assign.
+     */
     void Account::setHolderLastName(const std::string& entry) {
         holderLastName = entry;
     }
 
+    /**
+     * @brief Assigns a unique account number to this account.
+     * @param entry Account number to set.
+     */
     void Account::setHolderAccountNumber(const unsigned& entry) {
         holderAccountNumber = entry;
     }
 
+    /**
+     * @brief Sets the password for this account.
+     * @param entry Password string.
+     */
     void Account::setHolderPassword(const std::string& entry) {
         holderPassword = entry;
     }
 
+    /**
+     * @brief Sets the current balance for this account.
+     * @param entry Balance amount.
+     */
     void Account::setBalance(const double& entry) {
         balance = entry;
     }
 
-    // Accessors
+    // === Accessors ===
+
+    /**
+     * @brief Retrieves the first name of the account holder.
+     * @return First name as a string.
+     */
     std::string Account::getHolderFirstName() const {
         return holderFistName;
     }
 
+    /**
+     * @brief Retrieves the last name of the account holder.
+     * @return Last name as a string.
+     */
     std::string Account::getHolderLastName() const {
         return holderLastName;
     }
 
+    /**
+     * @brief Gets the unique account number.
+     * @return Account number.
+     */
     unsigned Account::getHolderAccountNumber() const {
         return holderAccountNumber;
     }
 
+    /**
+     * @brief Retrieves the account password.
+     * @return Password string.
+     */
     std::string Account::getHolderPassword() const {
         return holderPassword;
     }
 
+    /**
+     * @brief Gets the current account balance.
+     * @return Balance as a double.
+     */
     double Account::getBalance() const {
         return balance;
     }
 
-    // Transaction Functions
+    // === Transaction Functions ===
+
+    /**
+     * @brief Withdraws funds from the account and updates bank-wide totals.
+     *
+     * Prompts the user to enter a withdrawal amount within a valid range. Checks if
+     * sufficient funds are available; if so, reduces the account balance, logs the transaction,
+     * and updates the bank's total withdrawals and holdings accordingly.
+     *
+     * @param bank Reference to the BankFunds object to update global totals.
+     * @param storage Reference to the Storage object used for persisting data.
+     */
     void Account::withdrawal(BankFunds& bank, Storage& storage) {
         double amount = numericValidator("Enter withdrawal amount: ", 0.01, 5000.00);
 
@@ -62,11 +116,9 @@ namespace bankSimulation {
         balance -= amount;
         logTransaction("Withdrawal", amount, balance, storage);
 
-        // Update withdrawal total
         double updatedWithdrawals = bank.getTotalWithdrawals() + amount;
         bank.setTotalWithdrawals(updatedWithdrawals);
 
-        // Update total holdings
         double updatedHoldings = bank.getTotalHoldings() - amount;
         bank.setTotalHoldings(updatedHoldings);
 
@@ -74,18 +126,24 @@ namespace bankSimulation {
         printAccountBalance();
     }
 
-
+    /**
+     * @brief Deposits funds into the account and updates bank-wide totals.
+     *
+     * Prompts the user to enter a deposit amount within a valid range. Increases the account balance,
+     * logs the transaction, and updates the bank's total deposits and holdings accordingly.
+     *
+     * @param bank Reference to the BankFunds object to update global totals.
+     * @param storage Reference to the Storage object used for persisting data.
+     */
     void Account::deposit(BankFunds& bank, Storage& storage) {
         double amount = numericValidator("Enter deposit amount: ", 0.01, 5000.00);
 
         balance += amount;
         logTransaction("Deposit", amount, balance, storage);
 
-        // Update deposit total
         double updatedDeposits = bank.getTotalDeposits() + amount;
         bank.setTotalDeposits(updatedDeposits);
 
-        // Update total holdings
         double updatedHoldings = bank.getTotalHoldings() + amount;
         bank.setTotalHoldings(updatedHoldings);
 
@@ -93,8 +151,20 @@ namespace bankSimulation {
         printAccountBalance();
     }
 
-
-
+    /**
+     * @brief Records a financial transaction in the account’s history.
+     *
+     * Maintains a fixed-size log of the most recent transactions, recording type,
+     * amount, resulting balance, and a timestamp. If the log is full, it discards
+     * the oldest entry to make room for new transactions.
+     *
+     * Saves the updated account and bank data after logging.
+     *
+     * @param type Type of transaction (e.g., "Deposit", "Withdrawal").
+     * @param amount Amount of the transaction.
+     * @param resultingBalance Account balance after the transaction.
+     * @param storage Reference to the Storage object to save changes.
+     */
     void Account::logTransaction(const std::string& type, double amount, double resultingBalance, Storage& storage) {
         if (transactionCount >= maxTransactions) {
             std::cout << "Transaction log full. Oldest entry will be overwritten." << std::endl;
@@ -119,13 +189,20 @@ namespace bankSimulation {
 
         transactionHistory[transactionCount++] = t;
 
-        // Save updated data
         storage.saveAccount();
         storage.saveBank();
     }
 
+    // === Serialization ===
 
-    //Serialization Functions
+    /**
+     * @brief Serializes account data and writes it to a binary output stream.
+     *
+     * Stores personal info, balance, and transaction history in binary format
+     * for persistent storage.
+     *
+     * @param out Output stream to write the serialized data.
+     */
     void Account::serialize(std::ostream& out) const {
         size_t len;
 
@@ -171,6 +248,13 @@ namespace bankSimulation {
         }
     }
 
+    /**
+     * @brief Deserializes account data by reading from a binary input stream.
+     *
+     * Restores personal info, account balance, and transaction history from persisted storage.
+     *
+     * @param in Input stream to read the serialized data.
+     */
     void Account::deserialize(std::istream& in) {
         size_t len;
 
@@ -218,12 +302,19 @@ namespace bankSimulation {
         }
     }
 
-    // Print Functions
+    // === Display Functions ===
+
+    /**
+     * @brief Prints the current account balance formatted to two decimal places.
+     */
     void Account::printAccountBalance() const {
         std::cout << std::fixed << std::setprecision(2);
         std::cout << "Current Balance: $" << balance << std::endl;
     }
 
+    /**
+     * @brief Prints a detailed transaction history including timestamps and balances.
+     */
     void Account::printAccountHistory() const {
         std::cout << std::fixed << std::setprecision(2);
         std::cout << "Account #" << this->getHolderAccountNumber() << std::endl;
@@ -236,5 +327,4 @@ namespace bankSimulation {
                 << "Balance after: $" << t.resultingBalance << std::endl;
         }
     }
-
 }

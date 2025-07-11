@@ -5,9 +5,17 @@
 #include <string>
 #include <vector>
 
-
 namespace bankSimulation {
-    //User Input: String Validation
+
+    /**
+     * @brief Validates and returns a non-empty string input from the user.
+     *
+     * Prompts the user with the given message and reads a line of input.
+     * Continues to prompt until the user enters a non-empty string.
+     *
+     * @param prompt The message to display to the user.
+     * @return A validated, non-empty string input.
+     */
     std::string stringValidator(const std::string& prompt) {
         std::string userInput;
         while (true) {
@@ -22,7 +30,17 @@ namespace bankSimulation {
         }
     }
 
-    //User Input: Char Validation
+    /**
+     * @brief Validates a single character input against a list of valid options.
+     *
+     * Prompts the user with the given message and reads a character input.
+     * Converts input to lowercase for case-insensitive matching.
+     * Continues prompting until a valid character from validOptions is entered.
+     *
+     * @param prompt The message to display to the user.
+     * @param validOptions Vector of valid characters to accept.
+     * @return The validated character input (always lowercase).
+     */
     char charValidator(const std::string& prompt, const std::vector<char>& validOptions) {
         char input;
         while (true) {
@@ -45,7 +63,19 @@ namespace bankSimulation {
         }
     }
 
-    //User Input Check
+    /**
+     * @brief Asks the user a yes/no question and returns a boolean accordingly.
+     *
+     * Prompts the user with the given question and expects 'y' or 'n' input (case-insensitive).
+     * If 'y', outputs yesPrompt and returns true.
+     * If 'n', outputs noPrompt and returns false.
+     * Continues prompting until valid input is received.
+     *
+     * @param prompt The yes/no question to present.
+     * @param yesPrompt Message to display if the user answers yes.
+     * @param noPrompt Message to display if the user answers no.
+     * @return True if user answers yes, false if no.
+     */
     bool userCheck(const std::string& prompt, const std::string& yesPrompt, const std::string& noPrompt) {
         char choice;
         while (true) {
@@ -68,7 +98,16 @@ namespace bankSimulation {
         }
     }
 
-    //User Password Validation
+    /**
+     * @brief Handles user login by matching last name and password.
+     *
+     * Allows up to 3 attempts to find an account by last name.
+     * If found, allows up to 3 attempts to enter the correct password.
+     * Returns pointer to matched Account on success, nullptr on failure.
+     *
+     * @param storage Reference to Storage object containing accounts.
+     * @return Pointer to logged-in Account if successful, nullptr otherwise.
+     */
     Account* userLogIn(Storage& storage) {
         short securityCounter = 0;
         Account* matchedAccount = nullptr;
@@ -111,6 +150,15 @@ namespace bankSimulation {
         return nullptr;
     }
 
+    /**
+     * @brief Handles employee login by verifying employee password.
+     *
+     * Allows up to 3 attempts to enter correct employee password stored in bank funds.
+     * Returns true if successful, false if too many failed attempts.
+     *
+     * @param storage Reference to Storage object containing bank funds.
+     * @return True if employee login succeeds, false otherwise.
+     */
     bool employeeLogIn(Storage& storage) {
         short securityCounter = 0;
 
@@ -129,10 +177,15 @@ namespace bankSimulation {
         return false;
     }
 
-
-
-
-    //Strong Password Validation
+    /**
+     * @brief Validates the strength of a password string.
+     *
+     * Checks that the password is at least 8 characters long and contains at least
+     * one uppercase letter, one lowercase letter, one digit, and one symbol.
+     *
+     * @param password The password string to validate.
+     * @return True if the password meets all strength requirements, false otherwise.
+     */
     bool passwordCheck(const std::string& password) {
         if (password.length() < 8) return false;
 
