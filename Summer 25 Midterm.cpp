@@ -1,6 +1,5 @@
 /*TODO:
-* Bug hunt
-* main function
+* bug hunt!!
 */
 
 #include "containersAndFunctions.h"
@@ -11,5 +10,11 @@ using namespace bankSimulation;
 
 int main()
 {
+    Storage storage;
+    storage.loadBank();
+    storage.loadAccount();
+
+    branchMenu(storage);
+    
     return 0;
 }

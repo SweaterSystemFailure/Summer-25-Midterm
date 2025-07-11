@@ -4,7 +4,7 @@
 
 namespace bankSimulation {
 
-	void userMenu(Account& account, BankFunds& bank) {
+	void userMenu(Storage& storage, Account& account, BankFunds& bank) {
 		bool exit = false;
 		while (!exit) {
 			std::cout << std::endl << "Welcome to your account!" << std::endl;
@@ -28,7 +28,10 @@ namespace bankSimulation {
 				account.printAccountHistory();
 				break;
 			case 5:
+				storage.saveAccount();
+				storage.saveBank();
 				exit = true;
+				
 				break;
 			default:
 				std::cout << "Invalid selection." << std::endl;
@@ -56,6 +59,8 @@ namespace bankSimulation {
 				break;
 			case 3:
 				exit = true;
+				storage.saveAccount();
+				storage.saveBank();
 				break;
 			default:
 				std::cout << "Invalid selection." << std::endl;
@@ -82,7 +87,7 @@ namespace bankSimulation {
 					std::string lastName = stringValidator("Re-enter your last name to access your account: ");
 					for (auto& acc : storage.getAccounts()) {
 						if (acc.getHolderLastName() == lastName) {
-							userMenu(acc, storage.getFunds()[0]);
+							userMenu(storage, acc, storage.getFunds()[0]);
 							break;
 						}
 					}
@@ -96,6 +101,8 @@ namespace bankSimulation {
 				break;
 			case 4:
 				exit = true;
+				storage.saveAccount();
+				storage.saveBank();
 				break;
 			default:
 				std::cout << "Invalid selection." << std::endl;

@@ -74,7 +74,7 @@ namespace bankSimulation {
             }
 
             if (!found) {
-                std::cout << "No account found with that number.\n";
+                std::cout << "No account found with that number." << std::endl;
             }
             break;
         }
@@ -601,6 +601,8 @@ namespace bankSimulation {
         std::cout << "Too many failed login attempts. Exiting program.\n";
         return false;
     }
+
+    //Strong Password Validation
     bool passwordCheck(const std::string& password) {
         if (password.length() < 8) return false;
 
