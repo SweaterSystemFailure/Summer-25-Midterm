@@ -84,11 +84,21 @@ namespace bankSimulation {
 				storage.newAccount();
 				break;
 			case 2: {
+				if (storage.getAccounts().empty()) {
+					std::cout << "No accounts are currently stored. Please create a new account first.\n";
+					break;
+				}
+
 				if (logIn(storage, false)) {
 					std::string lastName = stringValidator("Re-enter your last name to access your account: ");
 					for (auto& acc : storage.getAccounts()) {
 						if (acc.getHolderLastName() == lastName) {
-							userMenu(storage, acc, storage.getFunds()[0]);
+							if (!storage.getFunds().empty()) {
+								userMenu(storage, acc, storage.getFunds()[0]);
+							}
+							else {
+								std::cout << "Bank funds are not initialized. Please contact an employee.\n";
+							}
 							break;
 						}
 					}

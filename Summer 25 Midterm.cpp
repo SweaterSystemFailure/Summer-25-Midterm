@@ -1,7 +1,3 @@
-/*TODO:
-* bug hunt!!
-*/
-
 #include "Account.h"
 #include "BankFunds.h"
 #include "menus.h"
@@ -16,6 +12,12 @@ int main()
     Storage storage;
     storage.loadBank();
     storage.loadAccount();
+    if (storage.getFunds().empty()) {
+        std::cerr << "WARNING: Bank funds failed to load.\n";
+    }
+    else {
+        std::cout << "Bank password loaded: " << storage.getFunds()[0].getPassword() << std::endl;
+    }
 
     branchMenu(storage);
     

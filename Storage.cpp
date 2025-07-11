@@ -113,9 +113,28 @@ namespace bankSimulation {
 
     void Storage::loadAccount() {
         std::ifstream in("accounts.dat", std::ios::binary);
+
         if (!in) {
-            std::cerr << "Could not open accounts.dat for reading." << std::endl;
-            return;
+            std::cerr << "accounts.dat not found. Creating a new file..." << std::endl;
+
+            // Create file with default values
+            std::ofstream out("accounts.dat", std::ios::binary);
+            if (!out) {
+                std::cerr << "Failed to create accounts.dat" << std::endl;
+                return;
+            }
+
+            size_t count = 0;
+            out.write(reinterpret_cast<const char*>(&count), sizeof(count));
+            out.write(reinterpret_cast<const char*>(&lastAccountNumber), sizeof(lastAccountNumber));
+            out.close();
+
+            // Now try loading again
+            in.open("accounts.dat", std::ios::binary);
+            if (!in) {
+                std::cerr << "Could not open accounts.dat after creation." << std::endl;
+                return;
+            }
         }
 
         size_t count;
@@ -129,7 +148,6 @@ namespace bankSimulation {
         }
 
         in.read(reinterpret_cast<char*>(&lastAccountNumber), sizeof(lastAccountNumber));
-
         in.close();
     }
 
@@ -151,21 +169,36 @@ namespace bankSimulation {
 
     void Storage::loadBank() {
         std::ifstream in("funds.dat", std::ios::binary);
-        if (!in) {
-            std::cerr << "Could not open funds.dat for reading." << std::endl;
+
+        if (!in || in.peek() == std::ifstream::traits_type::eof()) {
+            std::cerr << "funds.dat not found or empty. Creating default entry..." << std::endl;
+            funds.clear();
+            BankFunds defaultBank;
+            funds.push_back(defaultBank);
+            saveBank();  // Save it immediately
             return;
         }
 
         size_t count;
         in.read(reinterpret_cast<char*>(&count), sizeof(count));
-        funds.clear();
 
+        if (!in || count == 0) {
+            std::cerr << "Invalid or empty data. Recreating funds.dat with default values..." << std::endl;
+            funds.clear();
+            BankFunds defaultBank;
+            funds.push_back(defaultBank);
+            saveBank();
+            return;
+        }
+
+        funds.clear();
         for (size_t i = 0; i < count; ++i) {
             BankFunds temp;
             temp.deserialize(in);
             funds.push_back(temp);
         }
 
+        std::cout << "Successfully loaded " << funds.size() << " fund entries.\n";
         in.close();
     }
 }

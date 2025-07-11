@@ -7,9 +7,9 @@ namespace bankSimulation {
 	private:
 		double startingFunds = 15'000'000.00;
 		std::string password = "ShowMeTheMoney";
-		double totalHoldings;
-		double totalDeposits;
-		double totalWithdrawals;
+		double totalHoldings = 15'000'000.00;
+		double totalDeposits = 0.0;
+		double totalWithdrawals = 0.0;
 	public:
 		//Mutators
 		double setTotalHoldings(const double& entry);

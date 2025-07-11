@@ -2,6 +2,7 @@
 #include "Account.h"
 #include "Storage.h"
 #include "Validators.h"
+#include <iomanip>
 
 
 namespace bankSimulation {
@@ -72,6 +73,7 @@ namespace bankSimulation {
     // Print Function
     void BankFunds::printBankReport() const {
         std::cout << "--- Bank Report ---" << std::endl;
+        std::cout << std::fixed << std::setprecision(0);
         std::cout << "Starting Funds: $" << startingFunds << std::endl;
         std::cout << "Total Deposits: $" << totalDeposits << std::endl;
         std::cout << "Total Withdrawals: $" << totalWithdrawals << std::endl;
