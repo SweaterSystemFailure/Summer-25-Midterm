@@ -14,10 +14,11 @@ namespace bankSimulation {
 	private:
 		std::vector<Account> accounts;
 		std::vector<BankFunds> funds;
+		unsigned lastAccountNumber = 10'000;
 	public:
 		//Accessors
-		const std::vector<Account>& getAccounts() const { return accounts; };
-		std::vector<BankFunds>& getFunds() { return funds; };
+		const std::vector<Account>& getAccounts() const;
+		std::vector<BankFunds>& getFunds();
 
 		//Account Specific Functions
 		void newAccount();
@@ -138,4 +139,5 @@ namespace bankSimulation {
 	char charValidator(const std::string& prompt, const std::vector<char>& validOptions);
 	bool userCheck(const std::string& prompt, const std::string& yesPrompt, const std::string& noPrompt);
 	bool logIn(Storage& storage, bool employeeCheck);
+	bool passwordCheck(const std::string& password);
 }

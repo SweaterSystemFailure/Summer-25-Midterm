@@ -27,10 +27,18 @@ namespace bankSimulation {
         do {
             account.setHolderFirstName(stringValidator("Please enter your first name: "));
             account.setHolderLastName(stringValidator("Please enter your last name: "));
-            account.setHolderPassword(stringValidator("Please enter the password for your account: "));
+            std::string password;
+            do {
+                password = stringValidator("Please enter a strong password. Your password must contain at least 8 characters, a mix of upper/lowercase, a number, and a symbol): ");
+                if (!passwordCheck(password)) {
+                    std::cout << "Invalid Password. Please try again." << std::endl;
+                }
+            } while (!passwordCheck(password));
+            account.setHolderPassword(password);
         } while (!userCheck("Does this look right to you [Y / N]: ",
             "Your account is now active!",
             "That's okay. Let's try again."));
+        account.setHolderAccountNumber(lastAccountNumber++);
         account.setBalance(0.0);
         accounts.push_back(account);
     }
@@ -107,6 +115,8 @@ namespace bankSimulation {
             acc.serialize(out);
         }
 
+        out.write(reinterpret_cast<const char*>(&lastAccountNumber), sizeof(lastAccountNumber));
+
         out.close();
     }
 
@@ -126,6 +136,8 @@ namespace bankSimulation {
             temp.deserialize(in);
             accounts.push_back(temp);
         }
+
+        in.read(reinterpret_cast<char*>(&lastAccountNumber), sizeof(lastAccountNumber));
 
         in.close();
     }
@@ -214,33 +226,34 @@ namespace bankSimulation {
 
     // Transaction Functions
     void Account::withdrawal(bankSimulation::BankFunds& bank) {
-        float withdawal = bankSimulation::numericValidator("Please enter the amout of your withdrawal: ", 0.01, 5'000.00);
-        if (withdawal > balance) {
+        float withdrawal = bankSimulation::numericValidator("Enter withdrawal amount: ", 0.01f, 5000.0f);
+
+        if (withdrawal > balance) {
             std::cout << "Insufficient funds! ";
             printAccountBalance();
         }
         else {
-            balance -= withdawal;
-            accountHistory["Withdrawal"] -= withdawal;
+            balance -= withdrawal;
+            accountHistory["Withdrawal"] += withdrawal;
 
-            double updatedTotal = bank.getTotalWithdrawals() - withdawal;
-            bank.setTotalWithdrawals(updatedTotal);
+            double newTotal = bank.getTotalWithdrawals() + withdrawal;
+            bank.setTotalWithdrawals(newTotal);
 
-            std::cout << "Your withdrawal has been successfully prossessed! ";
+            std::cout << "Your withdrawal has been successfully processed! ";
             printAccountBalance();
         }
     }
 
     void Account::deposit(bankSimulation::BankFunds& bank) {
-        float deposit = bankSimulation::numericValidator("Please enter the amount of your deposit: ", 0.01, 5'000.00);
+        float deposit = bankSimulation::numericValidator("Enter deposit amount: ", 0.01f, 5000.0f);
+
         balance += deposit;
         accountHistory["Deposit"] += deposit;
 
-        double updatedTotal = bank.getTotalDeposits() + deposit;
-        bank.setTotalDeposits(updatedTotal);
+        double newTotal = bank.getTotalDeposits() + deposit;
+        bank.setTotalDeposits(newTotal);
 
-
-        std::cout << "Your deposit has been successfully possessed! ";
+        std::cout << "Your deposit has been successfully processed! ";
         printAccountBalance();
     }
 
@@ -347,7 +360,7 @@ namespace bankSimulation {
     }
 
     // Accessors
-    std::string getPassword() const {
+    std::string BankFunds::getPassword() const {
         return password;
     }
 
@@ -530,3 +543,17 @@ namespace bankSimulation {
         std::cout << "Too many failed login attempts. Exiting program.\n";
         return false;
     }
+    bool passwordCheck(const std::string& password) {
+        if (password.length() < 8) return false;
+
+        bool hasUpper = false, hasLower = false, hasDigit = false, hasSymbol = false;
+        for (char ch : password) {
+            if (std::isupper(ch)) hasUpper = true;
+            else if (std::islower(ch)) hasLower = true;
+            else if (std::isdigit(ch)) hasDigit = true;
+            else hasSymbol = true;
+        }
+
+        return hasUpper && hasLower && hasDigit && hasSymbol;
+    }
+}
