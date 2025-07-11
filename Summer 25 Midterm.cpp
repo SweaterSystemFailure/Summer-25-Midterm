@@ -2,8 +2,11 @@
 * bug hunt!!
 */
 
-#include "containersAndFunctions.h"
+#include "Account.h"
+#include "BankFunds.h"
 #include "menus.h"
+#include "Storage.h"
+#include "Validators.h"
 #include <iostream>
 
 using namespace bankSimulation;
