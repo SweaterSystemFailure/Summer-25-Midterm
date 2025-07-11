@@ -115,7 +115,7 @@ namespace bankSimulation {
         std::ifstream in("accounts.dat", std::ios::binary);
 
         if (!in) {
-            std::cerr << "accounts.dat not found. Creating a new file..." << std::endl;
+            std::cerr << "accounts.dat not found. Creating a new file." << std::endl;
 
             // Create file with default values
             std::ofstream out("accounts.dat", std::ios::binary);
@@ -148,6 +148,7 @@ namespace bankSimulation {
         }
 
         in.read(reinterpret_cast<char*>(&lastAccountNumber), sizeof(lastAccountNumber));
+        std::cout << "Successfully loaded account entries." << std::endl;
         in.close();
     }
 
@@ -171,7 +172,7 @@ namespace bankSimulation {
         std::ifstream in("funds.dat", std::ios::binary);
 
         if (!in || in.peek() == std::ifstream::traits_type::eof()) {
-            std::cerr << "funds.dat not found or empty. Creating default entry..." << std::endl;
+            std::cerr << "funds.dat not found. Creating new file." << std::endl;
             funds.clear();
             BankFunds defaultBank;
             funds.push_back(defaultBank);
@@ -183,7 +184,7 @@ namespace bankSimulation {
         in.read(reinterpret_cast<char*>(&count), sizeof(count));
 
         if (!in || count == 0) {
-            std::cerr << "Invalid or empty data. Recreating funds.dat with default values..." << std::endl;
+            std::cerr << "Invalid or empty data. Recreating funds.dat with default values." << std::endl;
             funds.clear();
             BankFunds defaultBank;
             funds.push_back(defaultBank);
@@ -198,7 +199,7 @@ namespace bankSimulation {
             funds.push_back(temp);
         }
 
-        std::cout << "Successfully loaded " << funds.size() << " fund entries.\n";
+        std::cout << "Successfully loaded fund entries." << std::endl;
         in.close();
     }
 }
