@@ -1,45 +1,106 @@
-#include "menus.h"
 #include "containersAndFunctions.h"
+#include "menus.h"
 #include <iostream>
 
+namespace bankSimulation {
 
-namespace BankSimulation {
-	void branchMenu(Storage& storage) {
-		std::cout << "Welcome to Laney Bank!" << std::endl;
-		std::cout << std::endl;
-		std::cout << "Would you like to: " << std::endl;
-		std::cout << "1. Create a new account" << std::endl;
-		std::cout << "2. Log in to an existing account" << std::endl;
-		std::cout << "3. Log in as an employee" << std::endl;
-		std::cout << "4. Exit program" << std::endl;
-		std::cout << std::endl;
+	void userMenu(Account& account, BankFunds& bank) {
+		bool exit = false;
+		while (!exit) {
+			std::cout << std::endl << "Welcome to your account!" << std::endl;
+			std::cout << "1. Deposit funds" << std::endl;
+			std::cout << "2. Withdraw funds" << std::endl;
+			std::cout << "3. Check account balance" << std::endl;
+			std::cout << "4. View transaction history" << std::endl;
+			std::cout << "5. Exit" << std::endl;
 
-		switch (numericValidator("Please enter your selection: ", 1, 4)) {
-		case 1:
-			storage.newAccount(Storage& storage);
-			break;
-		case 2:
-			if logIn(Storange & storage, false) {
-				userMenu(Storage & storage);
+			switch (numericValidator("Your selection: ", 1, 5)) {
+			case 1:
+				account.deposit(bank);
+				break;
+			case 2:
+				account.withdrawal(bank);
+				break;
+			case 3:
+				account.printAccountBalance();
+				break;
+			case 4:
+				account.printAccountHistory();
+				break;
+			case 5:
+				exit = true;
+				break;
+			default:
+				std::cout << "Invalid selection." << std::endl;
 			}
-			break;
-		case 3:
-			if logIn(Storage & storage, true) {
-				employeeMenu(Storage & storage);
-			}
-			break;
-		case 4:
-			break;
-		default:
-			std::cout << "Critical Error! Program closing." << std::endl;
 		}
 	}
 
-	void userMenu(Storage& storage) {
-		//TODO customer menu
+	void employeeMenu(Storage& storage) {
+		bool exit = false;
+		while (!exit) {
+			std::cout << std::endl <<  "Employee Menu" << std::endl;
+			std::cout << "1. Print bank report" << std::endl;
+			std::cout << "2. Search accounts" << std::endl;
+			std::cout << "3. Exit" << std::endl;
+
+			switch (numericValidator("Your selection: ", 1, 3)) {
+			case 1:
+				if (!storage.getFunds().empty())
+					storage.getFunds()[0].printBankReport();
+				else
+					std::cout << "Bank fund data unavailable." << std::endl;
+				break;
+			case 2:
+				storage.searchAccounts();
+				break;
+			case 3:
+				exit = true;
+				break;
+			default:
+				std::cout << "Invalid selection." << std::endl;
+			}
+		}
 	}
 
-	void employeeMenu(Storage& storage) {
-		//TODO: employee menu
+	void branchMenu(Storage& storage) {
+		bool exit = false;
+
+		while (!exit) {
+			std::cout << std::endl << "Welcome to Laney Bank!" << std::endl;
+			std::cout << "1. Create a new account" << std::endl;
+			std::cout << "2. Log in to an existing account" << std::endl;
+			std::cout << "3. Log in as an employee" << std::endl;
+			std::cout << "4. Exit" << std::endl;
+
+			switch (numericValidator("Your selection: ", 1, 4)) {
+			case 1:
+				storage.newAccount();
+				break;
+			case 2: {
+				if (logIn(storage, false)) {
+					// Get a pointer to the matching account
+					std::string lastName = stringValidator("Re-enter your last name to access your account: ");
+					for (auto& acc : storage.getAccounts()) {
+						if (acc.getHolderLastName() == lastName) {
+							userMenu(acc, storage.getFunds()[0]);
+							break;
+						}
+					}
+				}
+				break;
+			}
+			case 3:
+				if (logIn(storage, true)) {
+					employeeMenu(storage);
+				}
+				break;
+			case 4:
+				exit = true;
+				break;
+			default:
+				std::cout << "Invalid selection." << std::endl;
+			}
+		}
 	}
 }

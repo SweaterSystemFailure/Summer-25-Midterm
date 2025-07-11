@@ -347,6 +347,10 @@ namespace bankSimulation {
     }
 
     // Accessors
+    std::string getPassword() const {
+        return password;
+    }
+
     double BankFunds::getTotalHoldings() const {
         return totalHoldings;
     }
@@ -506,7 +510,7 @@ namespace bankSimulation {
         }
 
         if (!matchedAccount) {
-            std::cout << "Too many failed login attempts. Exiting program.\n";
+            std::cout << "Too many failed login attempts. Exiting program." << std::endl;
             return false;
         }
 
