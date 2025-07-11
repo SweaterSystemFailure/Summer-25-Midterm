@@ -1,6 +1,11 @@
 #pragma once
+#include <string>
+#include <vector>
+#include <iostream>
+#include <limits>
+#include "Storage.h"
 
-namespace BankSimulation {
+namespace bankSimulation {
 	template <typename T>
 	T numericValidator(const std::string& prompt, T min, T max) {
 		T number;
@@ -28,7 +33,7 @@ namespace BankSimulation {
 	std::string stringValidator(const std::string& prompt);
 	char charValidator(const std::string& prompt, const std::vector<char>& validOptions);
 	bool userCheck(const std::string& prompt, const std::string& yesPrompt, const std::string& noPrompt);
-	bool logIn(Storage& storage, bool employeeCheck);
+	bool logIn(bankSimulation::Storage& storage, bool employeeCheck);
 	bool passwordCheck(const std::string& password);
 }
 

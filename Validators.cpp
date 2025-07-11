@@ -1,10 +1,12 @@
 #include "Validators.h"
+#include "Account.h"
+#include "Storage.h"
 #include <iostream>
 #include <string>
 #include <vector>
 
 
-namespace BankSimulation {
+namespace bankSimulation {
     //User Input: String Validation
     std::string stringValidator(const std::string& prompt) {
         std::string userInput;

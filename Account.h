@@ -2,8 +2,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "BankFunds.h"
 
-namespace BankSimulation {
+namespace bankSimulation {
 	class Account {
 	private:
 		//Biographical Variables

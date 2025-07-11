@@ -1,5 +1,7 @@
 #include "BankFunds.h"
 #include "Account.h"
+#include "Storage.h"
+#include "Validators.h"
 
 
 namespace bankSimulation {

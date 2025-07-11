@@ -1,5 +1,7 @@
 #pragma once
-#include "containersAndFunctions.h" 
+#include "Storage.h"
+#include "BankFunds.h"
+#include "Account.h"
 
 namespace bankSimulation {
 	void userMenu(Account& account, BankFunds& bank);

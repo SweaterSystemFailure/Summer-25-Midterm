@@ -1,9 +1,11 @@
 #include "Account.h"
+#include "BankFunds.h"
+#include "Validators.h"
 #include <iomanip>
 #include <ctime>
 #include <sstream>
 
-namespace BankSimulation {
+namespace bankSimulation {
     // Mutators
     void Account::setHolderFirstName(const std::string& entry) {
         holderFistName = entry;
@@ -47,8 +49,8 @@ namespace BankSimulation {
     }
 
     // Transaction Functions
-    void Account::withdrawal(bankSimulation::BankFunds& bank) {
-        double amount = bankSimulation::numericValidator(
+    void Account::withdrawal(BankFunds& bank) {
+        double amount =numericValidator(
             "Enter withdrawal amount: ", 0.01, 5000.00);
 
         if (amount > balance) {
@@ -67,9 +69,8 @@ namespace BankSimulation {
         printAccountBalance();
     }
 
-    void Account::deposit(bankSimulation::BankFunds& bank) {
-        double amount = bankSimulation::numericValidator(
-            "Enter deposit amount: ", 0.01, 5000.00);
+    void Account::deposit(BankFunds& bank) {
+        double amount = numericValidator("Enter deposit amount: ", 0.01, 5000.00);
 
         balance += amount;
         logTransaction("Deposit", amount, balance);
@@ -98,10 +99,12 @@ namespace BankSimulation {
 
         // Get timestamp
         auto now = std::time(nullptr);
-        std::stringstream ss;
-        ss << std::put_time(std::localtime(&now), "%Y-%m-%d %H:%M:%S");
-        t.timestamp = ss.str();
+        std::tm timeInfo;
+        localtime_s(&timeInfo, &now);
 
+        std::stringstream ss;
+        ss << std::put_time(&timeInfo, "%Y-%m-%d %H:%M:%S");
+        std::string timestamp = ss.str();
         transactionHistory[transactionCount++] = t;
     }
 

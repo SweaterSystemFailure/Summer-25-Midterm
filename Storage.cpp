@@ -1,7 +1,7 @@
 #include "Storage.h"
 #include "Validators.h"
 
-namespace BankSimulation {
+namespace bankSimulation {
     //Accessors
     std::vector<Account>& Storage::getAccounts() {
         return accounts;

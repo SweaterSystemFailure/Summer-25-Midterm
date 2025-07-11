@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace BankSimulation {
+namespace bankSimulation {
 	class BankFunds {
 	private:
 		double startingFunds = 15'000'000.00;

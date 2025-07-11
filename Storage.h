@@ -3,7 +3,7 @@
 #include "Account.h"
 #include "BankFunds.h"
 
-namespace BankSimulation {
+namespace bankSimulation {
 	class Storage {
 	private:
 		std::vector<Account> accounts;
