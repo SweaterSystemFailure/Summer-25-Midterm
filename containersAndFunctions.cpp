@@ -228,44 +228,47 @@ namespace bankSimulation {
 
     // Transaction Functions
     void Account::withdrawal(bankSimulation::BankFunds& bank) {
-        float withdrawal = bankSimulation::numericValidator("Enter withdrawal amount: ", 0.01f, 5000.0f);
+        double amount = bankSimulation::numericValidator(
+            "Enter withdrawal amount: ", 0.01, 5000.00);
 
-        if (withdrawal > balance) {
-            std::cout << "Insufficient funds! ";
+        if (amount > balance) {
+            std::cout << "Insufficient funds. ";
             printAccountBalance();
+            return;
         }
-        else {
-            balance -= withdrawal;
-            accountHistory["Withdrawal"] += withdrawal;
 
-            double newTotal = bank.getTotalWithdrawals() + withdrawal;
-            bank.setTotalWithdrawals(newTotal);
+        balance -= amount;
+        logTransaction("Withdrawal", amount, balance);
 
-            std::cout << "Your withdrawal has been successfully processed! ";
-            printAccountBalance();
-        }
+        double updatedTotal = bank.getTotalWithdrawals() + amount;
+        bank.setTotalWithdrawals(updatedTotal);
+
+        std::cout << "Withdrawal successful. ";
+        printAccountBalance();
     }
 
-    void Account::deposit(BankFunds& bank) {
-        double depositAmount = numericValidator("Enter deposit amount: ", 0.01, 5000.0);
-        balance += depositAmount;
+    void Account::deposit(bankSimulation::BankFunds& bank) {
+        double amount = bankSimulation::numericValidator(
+            "Enter deposit amount: ", 0.01, 5000.00);
 
-        logTransaction("Deposit", depositAmount, balance);
+        balance += amount;
+        logTransaction("Deposit", amount, balance);
 
-        bank.setTotalDeposits(bank.getTotalDeposits() + depositAmount);
+        double updatedTotal = bank.getTotalDeposits() + amount;
+        bank.setTotalDeposits(updatedTotal);
 
         std::cout << "Deposit successful. ";
         printAccountBalance();
     }
 
     void Account::logTransaction(const std::string& type, double amount, double resultingBalance) {
-        if (transactionCount >= MAX_TRANSACTIONS) {
+        if (transactionCount >= maxTransactions) {
             std::cout << "Transaction log full. Oldest entry will be overwritten." << std::endl;
             // Optionally shift everything left
-            for (int i = 1; i < MAX_TRANSACTIONS; ++i) {
+            for (int i = 1; i < maxTransactions; ++i) {
                 transactionHistory[i - 1] = transactionHistory[i];
             }
-            transactionCount = MAX_TRANSACTIONS - 1;
+            transactionCount = maxTransactions - 1;
         }
 
         Transaction t;
@@ -305,17 +308,29 @@ namespace bankSimulation {
 
         out.write(reinterpret_cast<const char*>(&balance), sizeof(balance));
 
-        // History size
-        size_t mapSize = accountHistory.size();
-        out.write(reinterpret_cast<const char*>(&mapSize), sizeof(mapSize));
+        // Write transaction count
+        out.write(reinterpret_cast<const char*>(&transactionCount), sizeof(transactionCount));
 
-        for (const auto& [key, value] : accountHistory) {
-            len = key.size();
+        // Write each transaction
+        for (int i = 0; i < transactionCount; ++i) {
+            const Transaction& t = transactionHistory[i];
+
+            // Type
+            len = t.type.size();
             out.write(reinterpret_cast<const char*>(&len), sizeof(len));
-            out.write(key.c_str(), len);
-            out.write(reinterpret_cast<const char*>(&value), sizeof(value));
+            out.write(t.type.c_str(), len);
+
+            // Amount and postBalance
+            out.write(reinterpret_cast<const char*>(&t.amount), sizeof(t.amount));
+            out.write(reinterpret_cast<const char*>(&t.resultingBalance), sizeof(t.resultingBalance));
+
+            // Timestamp
+            len = t.timestamp.size();
+            out.write(reinterpret_cast<const char*>(&len), sizeof(len));
+            out.write(t.timestamp.c_str(), len);
         }
     }
+
 
     void Account::deserialize(std::istream& in) {
         size_t len;
@@ -330,6 +345,7 @@ namespace bankSimulation {
         holderLastName.resize(len);
         in.read(&holderLastName[0], len);
 
+        // Account number
         in.read(reinterpret_cast<char*>(&holderAccountNumber), sizeof(holderAccountNumber));
 
         // Password
@@ -337,23 +353,32 @@ namespace bankSimulation {
         holderPassword.resize(len);
         in.read(&holderPassword[0], len);
 
+        // Balance
         in.read(reinterpret_cast<char*>(&balance), sizeof(balance));
 
-        // History
-        size_t mapSize;
-        in.read(reinterpret_cast<char*>(&mapSize), sizeof(mapSize));
-        accountHistory.clear();
-        for (size_t i = 0; i < mapSize; ++i) {
-            std::string key;
-            float value;
+        // Read transaction count
+        in.read(reinterpret_cast<char*>(&transactionCount), sizeof(transactionCount));
 
+        // Read each transaction
+        for (int i = 0; i < transactionCount; ++i) {
+            Transaction& t = transactionHistory[i];
+
+            // Type
             in.read(reinterpret_cast<char*>(&len), sizeof(len));
-            key.resize(len);
-            in.read(&key[0], len);
-            in.read(reinterpret_cast<char*>(&value), sizeof(value));
-            accountHistory[key] = value;
+            t.type.resize(len);
+            in.read(&t.type[0], len);
+
+            // Amount and postBalance
+            in.read(reinterpret_cast<char*>(&t.amount), sizeof(t.amount));
+            in.read(reinterpret_cast<char*>(&t.resultingBalance), sizeof(t.resultingBalance));
+
+            // Timestamp
+            in.read(reinterpret_cast<char*>(&len), sizeof(len));
+            t.timestamp.resize(len);
+            in.read(&t.timestamp[0], len);
         }
     }
+
 
     // Print Functions
     void Account::printAccountBalance() const {

@@ -46,16 +46,16 @@ namespace bankSimulation {
 
 		//Transaction Element Storage
 		struct Transaction {
-			std::string type;       // "Deposit" or "Withdrawal"
+			std::string type;
 			double amount;
 			double resultingBalance;
 			std::string timestamp;
 		};
 
 		//Transaction Histoy
-		static const int MAX_TRANSACTIONS = 1'000;
+		static const int maxTransactions = 1'000;
 
-		Transaction transactionHistory[MAX_TRANSACTIONS];
+		Transaction transactionHistory[maxTransactions];
 		int transactionCount = 0;;
 
 	public:
